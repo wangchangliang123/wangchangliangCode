@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.newer.tang.data.dao.ITaskDAO">
+	<resultMap type="Task" id="taskmapper">
+		<id property="taskId" column="TASK_ID"/>
+		<result property="taskName" column="TASK_NAME"/>
+		<result property="beginDate" column="BEGIN_DATE"/>
+		<result property="endDate" column="END_DATE"/>
+		<result property="realbeginDate" column="REAL_BEGIN_DATE"/>
+		<result property="realendDate" column="REAL_END_DATE"/>
+		<result property="status" column="STATUS"/>
+		<result property="assignerId" column="ASSIGNER_ID"/>
+		<result property="taskDesc" column="TASK_DESC"/>
+		<association property="implementorId" resultMap="com.newer.tang.data.dao.IEmployeeDAO.empmapper">
+		</association>
+		<collection property="plan" ofType="Plan">
+			<id property="planId" column="PLAN_ID"/>
+			<result property="planName" column="PLAN_NAME"/>
+			<result property="status" column="STATUS"/>
+			<result property="isFeedback" column="IS_FEEDBACK"/>
+			<result property="beginDate" column="BEGIN_DATE"/>
+			<result property="endDate" column="END_DATE"/>
+			<result property="taskId" column="TASK_ID"/>
+			<result property="feedbackInfo" column="FEEDBACK_INFO"/>
+			<result property="planDesc" column="PLAN_DESC"/>
+		</collection>
+	</resultMap>
+	
+	<select id="queryAllTask" resultMap="taskmapper">
+	select *from t_employee e inner join t_task t on t.IMPLEMENTOR_ID=e.EMPLOYEE_ID inner join t_plan p on p.TASK_ID=t.TASK_ID 
+	</select>
+	
+	
+	<select id="queryByIdTask" resultMap="taskmapper" parameterType="int">
+	select *from t_employee e inner join t_task t on t.IMPLEMENTOR_ID=e.EMPLOYEE_ID left join t_plan p on p.TASK_ID=t.TASK_ID
+	where t.task_id=#{taskid}
+	</select>
+	
+	
+	<select id="queryByIdgengzonTask" resultMap="taskmapper" parameterType="int">
+	select *from t_employee e inner join t_task t on t.IMPLEMENTOR_ID=e.EMPLOYEE_ID
+	where t.task_id=#{taskid}
+	</select>
+	
+	<insert id="insertTask" parameterType="Task">
+	INSERT INTO t_task (task_id, task_name, begin_date, end_date, real_begin_date, real_end_date, status, implementor_id, assigner_id, task_desc) VALUES (seq_task.nextval,#{taskName},#{beginDate},#{endDate},null, null,'待实施',#{implementorId.employeeId},#{assignerId},#{taskDesc})
+	</insert>
+	
+	<select id="queryDSS" resultMap="taskmapper">
+	select *from t_task t inner join t_employee e on t.IMPLEMENTOR_ID=e.EMPLOYEE_ID where status='待实施'
+	</select>
+	
+	<delete id="deleteTask" parameterType="int">
+	delete from t_task where TASK_ID=#{id}
+	</delete>
+	
+	<select id="querySSZ" resultMap="taskmapper">
+	select *from t_task t inner join t_employee e on t.IMPLEMENTOR_ID=e.EMPLOYEE_ID where status='实施中'
+	</select>
+	
+	<update id="updateTask" parameterType="java.util.Map">
+	update T_task set status=#{status} where TASK_ID=#{taskid}
+	</update>
+	
+	<update id="updateTaskAll" parameterType="Task">
+	update T_task set TASK_NAME=#{taskName},TASK_DESC=#{taskDesc},BEGIN_DATE=#{beginDate},END_DATE=#{endDate},IMPLEMENTOR_ID=#{implementorId.employeeId} where TASK_ID=#{taskId}
+	</update>
+	
+	<select id="queryByIdallTask" resultMap="taskmapper" parameterType="int">
+	select *from t_employee e inner join t_task t  on t.ASSIGNER_ID=e.employee_id full join t_plan p on t.task_id=p.task_id where t.implementor_id=#{employeeid}
+	</select>
+	
+	
+</mapper>
