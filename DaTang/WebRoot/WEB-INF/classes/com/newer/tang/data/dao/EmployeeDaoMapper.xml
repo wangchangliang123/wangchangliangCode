@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.newer.tang.data.dao.IEmployeeDAO">
+	<resultMap type="Employee" id="empmapper">
+		<id property="employeeId" column="EMPLOYEE_ID"/>
+		<result property="employeeName" column="EMPLOYEE_NAME"/>
+		<result property="password" column="PASSWORD"/>
+		<result property="realName" column="REAL_NAME"/>
+		<result property="sex" column="SEX"/>
+		<result property="birthday" column="BIRTHDAY"/>
+		<result property="duty" column="DUTY"/>
+		<result property="enrollDate" column="ENROLLDATE"/>
+		<result property="edcucation" column="EDUCATION"/>
+		<result property="major" column="MAJOR"/>
+		<result property="experience" column="EXPERIENCE"/>
+		<result property="param" column="PARENT_ID"/>
+		
+		<association property="role" javaType="Role">
+		<id property="roleId" column="ROLE_ID"/>
+		<result property="roleName" column="ROLE_NAME"/>
+		<result property="roleDesc" column="ROLE_DESC"/>
+		</association>
+	</resultMap>
+	
+	<select id="queryByNameAndPassword" parameterType="java.util.Map" resultMap="empmapper">
+		select *from t_employee e inner join t_role r on e.role_id=r.role_id 
+		where EMPLOYEE_NAME = #{username} and PASSWORD = #{password}
+	</select>
+	
+	<select id="queryEmp" resultMap="empmapper">
+	select *from t_employee where ROLE_ID=4
+	</select>
+	
+	<select id="queryAllEmployeeRole" resultMap="empmapper">
+	select *from t_employee e inner join t_role r on e.role_id=r.role_id 
+	</select>
+	
+	<select id="queryByIdEmp" parameterType="int" resultMap="empmapper">
+	select *from t_employee where EMPLOYEE_ID=#{empid}
+	</select>
+	
+	<insert id="insertEmployee" parameterType="Employee">
+	insert into t_employee(employee_id,employee_name, password, real_name, sex, birthday, duty, enrolldate, education,major,experience,role_id) values(seq_employee.Nextval,#{employeeName},#{password},#{realName},#{sex},#{birthday},#{duty},#{enrollDate},#{edcucation},#{major},#{experience},#{role.roleId})
+	</insert>
+	
+	<delete id="deleteTask" parameterType="int">
+	delete from t_task where IMPLEMENTOR_ID=#{taskid}
+	</delete>
+	<delete id="deleteEmployee">
+	delete from t_employee where EMPLOYEE_ID=#{employeeid}
+	</delete>
+	
+	<update id="updateByIdEmployee" parameterType="Employee">
+	update T_EMPLOYEE set employee_name=#{employeeName}, password=#{password}, real_name=#{realName},sex=#{sex}, birthday=#{birthday}, duty=#{duty}, enrolldate=#{enrollDate}, education=#{edcucation},major=#{major},experience=#{experience},role_id=#{role.roleId} where employee_id=#{employeeId}
+	</update>
+</mapper>
